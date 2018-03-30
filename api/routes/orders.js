@@ -6,7 +6,7 @@ const Product = require('../models/product');
 const checkAuth = require('../middleware/check-auth');
 
 router.post('/', checkAuth, (req, res, next) => {
-    Product.findById(req.body.productId)
+    Product.findById(req.body.product)
         .then(product => {
             if (!product) {
                 return res.status(404).json({
@@ -16,7 +16,7 @@ router.post('/', checkAuth, (req, res, next) => {
             const order = new Order({
                 _id: mongoose.Types.ObjectId(),
                 quantity: req.body.quantity,
-                product: req.body.productId
+                product: req.body.product
             });
             return order.save()
         }).then(result => {
@@ -42,7 +42,7 @@ router.post('/', checkAuth, (req, res, next) => {
 router.get('/', checkAuth, (req, res, next) => {
     Order.find()
         .select('product quantity _id')
-        .populate('product', 'name')
+        .populate('product', 'name price')
         .exec()
         .then(docs => {
             const response = {
