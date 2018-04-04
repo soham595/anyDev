@@ -117,6 +117,7 @@ router.delete('/:userId', (req, res, next) => {
 });
 
 router.post('/profile/:userId', checkAuth, (req, res, next) => {
+    
     var query = {};
     var update = {
         name: req.body.name,
