@@ -37,6 +37,7 @@ router.post('/signup', (req, res, next) => {
                                         _id: result._id,
                                     }
                                 });
+
                             })
                             .catch(err => {
                                 console.log(err);
@@ -47,7 +48,7 @@ router.post('/signup', (req, res, next) => {
                     }
                 });
             }
-        })
+        });
 });
 
 router.post('/login', (req, res, next) => {
@@ -115,43 +116,28 @@ router.delete('/:userId', (req, res, next) => {
         });
 });
 
-router.post('/profile', checkAuth, (req, res, next) => {
-    User.findById(req.body.user)
-        .then(user => {
-            console.log(user);
-            if (!user) {
-                return res.status(404).json({
-                    message: 'User not found'
-                });
-            }
-            const profile = new Profile({
-                _id: new mongoose.Types.ObjectId(),
-                name: req.body.name,
-                age: req.body.age,
-                user: req.body.user,
-                education: req.body.education,
-                location: req.body.location,
-                phone: req.body.phone
-            });
-            return profile.save()
-        }).then(result => {
-        console.log(result);
-        res.status(201).json({
-            message: 'Product created.',
-            createdProfile: {
-                _id: result._id,
-                name: result.name,
-                age: result.age,
-                user: result.user,
-                education: result.education,
-                location: result.location,
-                phone: result.phone
-            }
-        });
-    }).catch(err => {
-        console.log(err);
-        res.status(500).json({error: err});
-    });
+router.post('/profile/:userId', checkAuth, (req, res, next) => {
+    
+    var query = {};
+    var update = {
+        name: req.body.name,
+        age: req.body.age,
+        user: req.body.user,
+        education: req.body.education,
+        location: req.body.location,
+        phone: req.body.phone
+    };
+    var options = {upsert: true, new: true,};
+    Profile.findOneAndUpdate(query, update, options)
+        .exec()
+        .then( result => {
+            console.log(result);
+            res.status(201).json(result);
+        })
+        .catch( err => {
+            console.log(err);
+            res.status(500).json({error: err});
+        })
 });
 
 module.exports = router;
