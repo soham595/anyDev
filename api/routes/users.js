@@ -116,19 +116,14 @@ router.delete('/:userId', (req, res, next) => {
         });
 });
 
-router.post('/profile/:userId', checkAuth, (req, res, next) => {
-    
-    var query = {};
-    var update = {
-        name: req.body.name,
-        age: req.body.age,
-        user: req.body.user,
-        education: req.body.education,
-        location: req.body.location,
-        phone: req.body.phone
-    };
-    var options = {upsert: true, new: true,};
-    Profile.findOneAndUpdate(query, update, options)
+router.post('/profile/:profileId', checkAuth, (req, res, next) => {
+    const id = req.params.profileId;
+    const updateOps = {};
+    for (const ops of req.body) {
+        updateOps[ops.propName] = ops.value;
+    }
+    var options = {new: true};
+    Profile.findOneAndUpdate({_id: id}, updateOps, options)
         .exec()
         .then( result => {
             console.log(result);
